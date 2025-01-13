@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MuGaw. Calculator</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="shortcut icon" href="Calculator.webp" type="image/x-icon">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-500 to-purple-600 dark:from-gray-900 dark:to-gray-800 flex flex-col items-center justify-center min-h-screen">
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md backdrop-blur-md bg-opacity-20 dark:bg-opacity-20">
+    <!-- Dark Mode Toggle -->
+    <div class="flex justify-end mb-4">
+      <button onclick="toggleDarkMode()" class="bg-gray-200 dark:bg-gray-700 p-2 rounded-full">
+        <span id="darkModeIcon">🌙</span>
+      </button>
+    </div>
+
+    <h1 class="text-2xl font-bold text-center mb-4 dark:text-white header-title">Universal Calculator</h1>
+    <input type="text" id="display" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded mb-4 text-right text-xl dark:bg-gray-700 dark:text-white bg-opacity-50 backdrop-blur-sm" readonly>
+    
+    <!-- History Panel -->
+    <div id="history" class="mb-4 p-3 border border-gray-300 dark:border-gray-600 rounded h-24 overflow-y-auto dark:bg-gray-700 dark:text-white bg-opacity-50 backdrop-blur-sm">
+      <p class="text-sm">History:</p>
+    </div>
+
+    <!-- Calculator Buttons -->
+    <div class="grid grid-cols-4 gap-2">
+      <button onclick="clearDisplay()" class="col-span-2 bg-red-500 text-white p-3 rounded hover:bg-red-600">C</button>
+      <button onclick="deleteLast()" class="bg-yellow-500 text-white p-3 rounded hover:bg-yellow-600">DEL</button>
+      <button onclick="appendOperator('/')" class="bg-blue-500 text-white p-3 rounded hover:bg-blue-600">/</button>
+      <button onclick="appendNumber('7')" class="bg-gray-200 dark:bg-gray-600 p-3 rounded hover:bg-gray-300 dark:hover:bg-gray-500">7</button>
+      <button onclick="appendNumber('8')" class="bg-gray-200 dark:bg-gray-600 p-3 rounded hover:bg-gray-300 dark:hover:bg-gray-500">8</button>
+      <button onclick="appendNumber('9')" class="bg-gray-200 dark:bg-gray-600 p-3 rounded hover:bg-gray-300 dark:hover:bg-gray-500">9</button>
+      <button onclick="appendOperator('*')" class="bg-blue-500 text-white p-3 rounded hover:bg-blue-600">*</button>
+      <button onclick="appendNumber('4')" class="bg-gray-200 dark:bg-gray-600 p-3 rounded hover:bg-gray-300 dark:hover:bg-gray-500">4</button>
+      <button onclick="appendNumber('5')" class="bg-gray-200 dark:bg-gray-600 p-3 rounded hover:bg-gray-300 dark:hover:bg-gray-500">5</button>
+      <button onclick="appendNumber('6')" class="bg-gray-200 dark:bg-gray-600 p-3 rounded hover:bg-gray-300 dark:hover:bg-gray-500">6</button>
+      <button onclick="appendOperator('-')" class="bg-blue-500 text-white p-3 rounded hover:bg-blue-600">-</button>
+      <button onclick="appendNumber('1')" class="bg-gray-200 dark:bg-gray-600 p-3 rounded hover:bg-gray-300 dark:hover:bg-gray-500">1</button>
+      <button onclick="appendNumber('2')" class="bg-gray-200 dark:bg-gray-600 p-3 rounded hover:bg-gray-300 dark:hover:bg-gray-500">2</button>
+      <button onclick="appendNumber('3')" class="bg-gray-200 dark:bg-gray-600 p-3 rounded hover:bg-gray-300 dark:hover:bg-gray-500">3</button>
+      <button onclick="appendOperator('+')" class="bg-blue-500 text-white p-3 rounded hover:bg-blue-600">+</button>
+      <button onclick="appendNumber('0')" class="col-span-2 bg-gray-200 dark:bg-gray-600 p-3 rounded hover:bg-gray-300 dark:hover:bg-gray-500">0</button>
+      <button onclick="appendNumber('.')" class="bg-gray-200 dark:bg-gray-600 p-3 rounded hover:bg-gray-300 dark:hover:bg-gray-500">.</button>
+      <button onclick="calculate()" class="bg-green-500 text-white p-3 rounded hover:bg-green-600">=</button>
+      <button onclick="appendFunction('sqrt(')" class="bg-purple-500 text-white p-3 rounded hover:bg-purple-600">√</button>
+      <button onclick="appendFunction('sin(')" class="bg-purple-500 text-white p-3 rounded hover:bg-purple-600">sin</button>
+      <button onclick="appendFunction('cos(')" class="bg-purple-500 text-white p-3 rounded hover:bg-purple-600">cos</button>
+      <button onclick="appendFunction('tan(')" class="bg-purple-500 text-white p-3 rounded hover:bg-purple-600">tan</button>
+      <button onclick="appendFunction('log(')" class="bg-purple-500 text-white p-3 rounded hover:bg-purple-600">log</button>
+      <button onclick="appendFunction('pow(')" class="bg-purple-500 text-white p-3 rounded hover:bg-purple-600">^</button>
+      <button onclick="appendFunction('(')" class="bg-purple-500 text-white p-3 rounded hover:bg-purple-600">(</button>
+      <button onclick="appendFunction(')')" class="bg-purple-500 text-white p-3 rounded hover:bg-purple-600">)</button>
+    </div>
+
+    <!-- Unit Conversion Section -->
+    <div class="mt-6">
+      <h2 class="text-xl font-bold mb-2 dark:text-white">Unit Conversions</h2>
+      <div class="grid grid-cols-2 gap-2">
+        <input type="number" id="unitInput" class="p-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white bg-opacity-50 backdrop-blur-sm" placeholder="Enter value">
+        <select id="unitType" class="p-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white bg-opacity-50 backdrop-blur-sm">
+          <option value="metersToFeet">Meters to Feet</option>
+          <option value="feetToMeters">Feet to Meters</option>
+          <option value="celsiusToFahrenheit">Celsius to Fahrenheit</option>
+          <option value="fahrenheitToCelsius">Fahrenheit to Celsius</option>
+        </select>
+        <button onclick="convertUnit()" class="col-span-2 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Convert</button>
+        <p id="unitResult" class="col-span-2 text-center dark:text-white"></p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p class="footer-text">
+      Copyrights Reserved to the Creator Muhammad Gawad 
+    </p>
+    <p class="footer-text">Made with <span class="heart-icon">❤</span></p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
